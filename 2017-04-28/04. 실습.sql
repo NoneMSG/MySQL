@@ -46,13 +46,42 @@ and s.salary >any (select sal.salary
 					and sal.to_date = "9999-01-01"
 					and dptemp.to_date = "9999-01-01"
 					group by dept.dept_name
-					having avg(sal.salary))
+					having avg(sal.salary));
+
+-- 04 현재 사원의 사번, 이름, 매니저 이름, 부서 이름 출력
+
+select e.emp_no,
+concat (e.first_name," ",e.last_name) as name,
+concat( em.first_name, " ", em.last_name) as mname,
+d.dept_name as depart
+from employees e, dept_emp de, dept_manager dm, employees em,
+departments d
+where e.emp_no = de.emp_no
+and de.dept_no = dm.dept_no
+and d.dept_no =de.dept_no
+and de.to_date = "9999-01-01"
+and dm.to_date = "9999-01-01"
 ;
 
--- 04
-
--- 05
-
+-- 05 현재, 평균연봉 가장 높은 부서의 사원들 사번, 이름, 직책, 연봉 조회 연봉순으로
+select a.emp_no, a.first_name, b.title, c.salary
+  from employees a,
+       titles b,
+       salaries c, 
+	   dept_emp d,
+       (  select b.dept_no, avg(c.salary )
+            from employees a, dept_emp b, salaries c
+           where a.emp_no = b.emp_no
+             and a.emp_no = c.emp_no
+             and b.to_date = "9999-01-01"
+             and c.to_date = "9999-01-01"
+	    group by b.dept_no
+        order by avg(c.salary ) desc
+           limit 0, 1) e
+ where a.emp_no = b.emp_no
+    and a.emp_no = c.emp_no
+    and a.emp_no = d.emp_no
+    and d.dept_no = e.dept_no;
 
 -- 06. 평균 연봉 가장 높은 부서
 
